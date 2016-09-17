@@ -1,14 +1,14 @@
 {
-  "name": "semver-gitlog",
+  "name": "gitlog-semver",
   "version": "0.0.0",
-  "description": "Identify the required release type based on commit messages.",
-  "main": "index.js",
+  "description": "Identify the required Semantic Versioning release type based on commit messages.",
+  "main": "lib/gitlogSemver.js",
   "scripts": {
     "test": "bot"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/scherermichael/semver-gitlog.git"
+    "url": "git://github.com/scherermichael/gitlog-semver.git"
   },
   "keywords": [
     "git",
@@ -22,7 +22,16 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/scherermichael/semver-gitlog/issues"
+    "url": "https://github.com/scherermichael/gitlog-semver/issues"
   },
-  "homepage": "https://github.com/scherermichael/semver-gitlog#readme"
+  "homepage": "https://github.com/scherermichael/gitlog-semver#readme",
+  "devDependencies": {
+    "assertthat": "0.8.0",
+    "proxyquire": "1.7.10",
+    "roboter": "0.13.0",
+    "roboter-server": "0.13.0"
+  },
+  "dependencies": {
+    "shelljs": "0.7.4"
+  }
 }
