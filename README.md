@@ -58,7 +58,7 @@ It greps for commit messages that begin with any of the given labels, delimited 
 | `Mayor: All new` | n/a (typo in label)                   |
 | `Giant: All new` | n/a (unknown label)                   |
 
-Instead of defining your own `labels` object, you may omit the parameter:
+Instead of defining your own `labels` object, you may omit the parameter.
 
 ```javascript
 gitlogSemver((err, releaseType) => {
