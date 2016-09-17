@@ -70,9 +70,9 @@ In this case the following default labels will be used:
 
 ```javascript
 const labels = {
-  major: 'major:'
+  major: 'major:',
   minor: 'minor:',
-  patch: 'patch:',
+  patch: 'patch:'
 }
 ```
 
