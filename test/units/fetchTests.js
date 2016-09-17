@@ -44,7 +44,7 @@ suite('fetch', () => {
     resultGit = 'line1\nline2\n';
     fetch('startTag', [ 'label' ], (err, result) => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label)s+" -E -i --pretty=format:%s');
+      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       assert.that(result).is.equalTo([
         'line1',
         'line2'
@@ -56,7 +56,7 @@ suite('fetch', () => {
   test('handles single label as string instead of an array.', done => {
     fetch('startTag', 'label', err => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label)s+" -E -i --pretty=format:%s');
+      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();
     });
   });
@@ -64,7 +64,7 @@ suite('fetch', () => {
   test('does not set commit range if no last tag exists.', done => {
     fetch(null, 'label', err => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log  --oneline --grep "^(label)s+" -E -i --pretty=format:%s');
+      assert.that(calledCommand).is.equalTo('log  --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();
     });
   });
