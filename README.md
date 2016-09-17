@@ -42,7 +42,7 @@ gitlogSemver(labels, (err, releaseType) => {
     return console.log('Something went wrong...');
   }
 
-  console.log(releaseType); // => 'patch', 'minor' or 'major'
+  console.log(releaseType); // => 'major', 'minor' or 'patch'
 });
 ```
 
@@ -78,7 +78,7 @@ const labels = {
 
 ### Matching commit messages
 
-You can also get a list of commit messages that mach the given labels.
+You can also get a list of commit messages that match the given labels.
 
 ```javascript
 gitlogSemver(labels, (err, releaseType, messages) => {
@@ -101,4 +101,4 @@ gitlogSemver(labels, (err, releaseType, messages) => {
 });
 ```
 
-The `messages` object contains an array with the commit messages for each release type. Only the fist line of the commit message will be shown and the preceding label is already stripped off the message text. If no message has been found for a release type, the corresponding property contains an empty array.
+The `messages` object contains an array with the commit messages for each release type. Only the fist line of the commit message will be included and the preceding label is already stripped off the message text. If no message has been found for a release type, the corresponding property contains an empty array.
