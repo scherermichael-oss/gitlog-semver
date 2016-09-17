@@ -24,9 +24,9 @@ First define the labels you want to filter for. Each release type (`major`, `min
 
 ```javascript
 const labels = {
-  major: 'major:'
+  major: 'major:',
   minor: [ 'minor:', 'new:' ],
-  patch: [ 'patch:', 'fix:' ],
+  patch: [ 'patch:', 'fix:' ]
 }
 ```
 
