@@ -7,8 +7,8 @@ let calledCommand,
     errGit,
     resultGit;
 
-const fetch = proxyquire('../../lib/fetch', {
-  './git' (command, callback) {
+const fetch = proxyquire('../../../lib/git/fetch', {
+  './exec' (command, callback) {
     calledCommand = command;
     callback(errGit, resultGit);
   }

@@ -7,8 +7,8 @@ let calledCommand,
     errGit,
     resultGit;
 
-const lastTag = proxyquire('../../lib/lastTag', {
-  './git' (command, callback) {
+const lastTag = proxyquire('../../../lib/git/lastTag', {
+  './exec' (command, callback) {
     calledCommand = command;
     callback(errGit, resultGit);
   }
