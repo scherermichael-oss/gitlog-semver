@@ -1,6 +1,6 @@
 # gitlog-semver
 
-Identify the required [Semantic Versioning](http://sermver.org) release type based on commit messages.
+Identifies the required [Semantic Versioning](http://sermver.org) release type based on commit messages.
 
 ## Installation
 
@@ -16,28 +16,12 @@ First you need to integrate gitlog-semver into your application.
 const gitlogSemver = require('gitlog-semver');
 ```
 
-### Defining the filter
-
-Your commit log is filtered based on labels that are used to prefix the commit messages. Only commit messages newer than the most recent tag are taken into account.
-
-First define the labels you want to filter for. Each release type (`major`, `minor`, `patch`) contains its own set of labels:
-
-```javascript
-const labels = {
-  major: 'major:',
-  minor: [ 'minor:', 'new:' ],
-  patch: [ 'patch:', 'fix:' ]
-}
-```
-
-It it not necessary to use an array for a single label (see `major` in the sample above).
-
 ### Type of next release
 
-Now, you can use the function to retrieve the type of the next release.
+Then you can use the function to retrieve the type of the next release.
 
 ```javascript
-gitlogSemver(labels, (err, releaseType) => {
+gitlogSemver((err, releaseType) => {
   if (err) {
     return console.log('Something went wrong...');
   }
@@ -46,42 +30,44 @@ gitlogSemver(labels, (err, releaseType) => {
 });
 ```
 
-It greps for commit messages that begin with any of the given labels, delimited by at least one space from the rest of the message. Here are some samples for the `labels` object defined above:
+In order to determine the type of the next release, messages from commits newer than the most recent tag are filtered. Only commit messages that start with a label for the corresponding release type, delimited by at least one space from the rest of the message, are taken into account. Valid labels are `major:`, `minor:`, `patch:`. The following samples demonstrate the rules:
 
 | Commit message   | Matching release type                 |
 |------------------|---------------------------------------|
 | `patch: Foobar`  | `patch`                               |
-| `patch:Foobar`   | n/a (note the missing space)          |
+| `patch:Foobar`   | n/a (missing space)                   |
 | `patch:  Foobar` | `patch` (multiple spaces are allowed) |
 | `Minor: Foobar`  | `minor` (match is case insensitive)   |
 | `Major: All new` | `major`                               |
 | `Mayor: All new` | n/a (typo in label)                   |
 | `Giant: All new` | n/a (unknown label)                   |
 
-Instead of defining your own `labels` object, you may omit the parameter.
+### Custom filter
+
+If you want to use other labels, you can create a `filter` object. For each release type (`major`, `minor`, `patch`) define an array of labels you want to associate with.
 
 ```javascript
-gitlogSemver((err, releaseType) => {
+const filter = {
+  major: [ 'major:' ],
+  minor: [ 'minor:', 'new:' ],
+  patch: [ 'patch:', 'fix:' ]
+}
+```
+
+To use the `filter`, add the object as the first parameter of the function.
+
+```javascript
+gitlogSemver(filter, (err, releaseType) => {
   // ...
 });
 ```
 
-In this case the following default labels will be used:
+### List of commit messages
+
+The callback provides the commit messages that match the filter, too.
 
 ```javascript
-const labels = {
-  major: 'major:',
-  minor: 'minor:',
-  patch: 'patch:'
-}
-```
-
-### Matching commit messages
-
-You can also get a list of commit messages that match the given labels.
-
-```javascript
-gitlogSemver(labels, (err, releaseType, messages) => {
+gitlogSemver((err, releaseType, messages) => {
   if (err) {
     return console.log('Something went wrong...');
   }
@@ -101,4 +87,54 @@ gitlogSemver(labels, (err, releaseType, messages) => {
 });
 ```
 
-The `messages` object contains an array with the commit messages for each release type. Only the fist line of the commit message will be included and the preceding label is already stripped off the message text. If no message has been found for a release type, the corresponding property contains an empty array.
+The `messages` object contains an array with the commit messages for each release type. Only the first line of the commit message will be included and the preceding label is already removed from the message text.
+
+#### Release history
+
+If you want to also get the filtered commit messages for already released versions, set the property `limit` of the `filter` object. By setting it to `-1`, the whole commit history will be filtered.
+
+```javascript
+const filter = {
+  limit: -1,
+  major: 'major:',
+  minor: 'minor:',
+  patch: 'patch:'  
+}
+
+gitlogSemver(filter, (err, releaseType, releases) => {
+  if (err) {
+    return console.log('Something went wrong...');
+  }
+
+  console.log(releases); // =>
+    // [{
+    //   version: '1.0.0',
+    //   date: '2016-09-17',
+    //   messages: {
+    //     major: [ 'Initial release' ],
+    //     minor: [],
+    //     patch: []
+    //   }
+    // }, {
+    //   version: '1.1.0',
+    //   date: '2016-09-18',
+    //   messages: {
+    //     major: [],
+    //     minor: [ 'Some bugs fixed' ],
+    //     patch: []
+    //   }
+    // }, {
+    //   messages: {
+    //     major: [ 'Breaking changes made' ],
+    //     minor: [ 'Some new minor features'],
+    //     patch: []
+    //   }
+    // }]
+});
+```
+
+The returned `releases` is an array of objects. An object contains the `version` of a release (name of the tag) and its creation `date`. The `messages` property lists all matching commit messages. The last object contains only a `messages` property with the messages of all commits that are not yet released.
+
+By setting the `limit` to a positive number, you can define the maximum length of the `releases` array.
+
+Of course, the returned `releaseType` still provides the type of the next release.

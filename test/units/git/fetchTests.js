@@ -53,16 +53,8 @@ suite('fetch', () => {
     });
   });
 
-  test('handles single label as string instead of an array.', done => {
-    fetch('startTag', 'endTag', 'label', err => {
-      assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log startTag..endTag --oneline --grep "^(label) +" -E -i --pretty=format:%s');
-      done();
-    });
-  });
-
   test('does not set commit range if no start tag exists.', done => {
-    fetch(null, 'endTag', 'label', err => {
+    fetch(null, 'endTag', [ 'label' ], err => {
       assert.that(err).is.null();
       assert.that(calledCommand).is.equalTo('log  --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();
@@ -70,7 +62,7 @@ suite('fetch', () => {
   });
 
   test('uses \'HEAD\' as end point of the commit range if no end tag exists.', done => {
-    fetch('startTag', null, 'label', err => {
+    fetch('startTag', null, [ 'label' ], err => {
       assert.that(err).is.null();
       assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();

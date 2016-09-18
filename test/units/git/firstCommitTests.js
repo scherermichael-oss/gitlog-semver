@@ -7,14 +7,14 @@ let calledCommand,
     errGit,
     resultGit;
 
-const lastTag = proxyquire('../../../lib/git/lastTag', {
+const firstCommit = proxyquire('../../../lib/git/firstCommit', {
   './exec' (command, callback) {
     calledCommand = command;
     callback(errGit, resultGit);
   }
 });
 
-suite('lastTag', () => {
+suite('firstCommit', () => {
   setup(() => {
     calledCommand = '';
     errGit = null;
@@ -22,41 +22,32 @@ suite('lastTag', () => {
   });
 
   test('is a function.', done => {
-    assert.that(lastTag).is.ofType('function');
+    assert.that(firstCommit).is.ofType('function');
     done();
   });
 
   test('throws an error if callback is missing.', done => {
     assert.that(() => {
-      lastTag();
+      firstCommit();
     }).is.throwing('Callback is missing.');
     done();
   });
 
-  test('calls `git describe`.', done => {
+  test('calls `git tag`.', done => {
     resultGit = 'foo';
-    lastTag((err, result) => {
+    firstCommit((err, result) => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('describe --tags --abbrev=0');
+      assert.that(calledCommand).is.equalTo('rev-list --max-parents=0 HEAD');
       assert.that(result).is.equalTo(resultGit);
       done();
     });
   });
 
-  test('returns an error if `git describe` failed.', done => {
+  test('returns an error if `git tag` failed.', done => {
     errGit = new Error('foo');
-    lastTag(err => {
+    firstCommit(err => {
       assert.that(err).is.not.null();
       assert.that(err.message).is.equalTo('foo');
-      done();
-    });
-  });
-
-  test('returns `null` as tag instead of throwing an error if no tag exists.', done => {
-    errGit = new Error('\'git describe --tags --abbrev=0\' returned an error: fatal: No names found, cannot describe anything.\n');
-    lastTag((err, result) => {
-      assert.that(err).is.null();
-      assert.that(result).is.null();
       done();
     });
   });

@@ -3,32 +3,57 @@
 const assert = require('assertthat'),
       proxyquire = require('proxyquire');
 
-let errFetch,
-    errLastTag,
-    resultFetch,
-    resultLastTag;
+let allTags = {},
+    dateOfTag = {},
+    evaluate = {},
+    firstCommit = {};
 
 const gitlogSemver = proxyquire('../../lib/gitlogSemver', {
+  './evaluate' (startTag, endTag, filter, callback) {
+    evaluate.input = {
+      endTag,
+      filter,
+      startTag
+    };
+    callback(evaluate.err, evaluate.result.releaseType, evaluate.result.messages);
+  },
   './git': {
-    'fetch' (startTag, endTag, labels, callback) {
-      callback(errFetch, resultFetch[labels]);
+    allTags (callback) {
+      callback(allTags.err, allTags.result);
     },
-    'lastTag' (callback) {
-      callback(errLastTag, resultLastTag);
+    dateOfTag (tag, callback) {
+      evaluate.input = {
+        tag
+      };
+      callback(dateOfTag.err, dateOfTag.result);
+    },
+    firstCommit (callback) {
+      callback(firstCommit.err, firstCommit.result);
     }
   }
 });
 
 suite('gitlogSemver', () => {
   setup(() => {
-    errFetch = null;
-    resultFetch = {
-      'major:': [],
-      'minor:': [],
-      'patch:': []
+    allTags = {
+      err: null,
+      result: [ 'tag1', 'tag2' ]
     };
-    errLastTag = null;
-    resultLastTag = '1.0.0';
+    dateOfTag = {
+      err: null,
+      result: undefined
+    };
+    evaluate = {
+      err: null,
+      result: {
+        releaseType: 'patch',
+        messages: { major: [], minor: [], patch: []}
+      }
+    };
+    firstCommit = {
+      err: null,
+      result: 'firstCommit'
+    };
   });
 
   test('is a function.', done => {
@@ -43,98 +68,42 @@ suite('gitlogSemver', () => {
     done();
   });
 
-  test('returns release type `patch` if no matching commit messages exist.', done => {
+  test('returns the evaluated release type.', done => {
+    evaluate.result.releaseType = 'foo';
     gitlogSemver((err, releaseType) => {
       assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('patch');
+      assert.that(releaseType).is.equalTo('foo');
       done();
     });
   });
 
-  test('returns release type `patch` if only patch commit messages exist.', done => {
-    resultFetch['patch:'] = [ 'message' ];
-    gitlogSemver((err, releaseType, messages) => {
+  test('returns the evaluated commit messages.', done => {
+    evaluate.result.messages = {
+      foo: [ 'bar' ]
+    };
+    gitlogSemver((err, releaseType, release) => {
       assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('patch');
-      assert.that(messages).is.equalTo({
-        major: [],
-        minor: [],
-        patch: [ 'message' ]
+      assert.that(release.messages).is.equalTo({
+        foo: [ 'bar' ]
       });
       done();
     });
   });
 
-  test('returns release type `minor` if only minor commit messages exist.', done => {
-    resultFetch['minor:'] = [ 'message' ];
-    gitlogSemver((err, releaseType, messages) => {
+  test('evaluates the given filter.', done => {
+    const filter = {
+      foo: 'bar'
+    };
+
+    gitlogSemver(filter, err => {
       assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('minor');
-      assert.that(messages).is.equalTo({
-        major: [],
-        minor: [ 'message' ],
-        patch: []
-      });
+      assert.that(evaluate.input.filter).is.equalTo(filter);
       done();
     });
   });
 
-  test('returns release type `minor` if minor and patch commit messages exist.', done => {
-    resultFetch['minor:'] = [ 'message 1' ];
-    resultFetch['patch:'] = [ 'message 2' ];
-    gitlogSemver((err, releaseType, messages) => {
-      assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('minor');
-      assert.that(messages).is.equalTo({
-        major: [],
-        minor: [ 'message 1' ],
-        patch: [ 'message 2' ]
-      });
-      done();
-    });
-  });
-
-  test('returns release type `major` if only major commit messages exist.', done => {
-    resultFetch['major:'] = [ 'message' ];
-    gitlogSemver((err, releaseType, messages) => {
-      assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('major');
-      assert.that(messages).is.equalTo({
-        major: [ 'message' ],
-        minor: [],
-        patch: []
-      });
-      done();
-    });
-  });
-
-  test('returns release type `major` if commit messages of all types exist.', done => {
-    resultFetch['major:'] = [ 'message 1' ];
-    resultFetch['minor:'] = [ 'message 2' ];
-    resultFetch['patch:'] = [ 'message 3' ];
-    gitlogSemver((err, releaseType, messages) => {
-      assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('major');
-      assert.that(messages).is.equalTo({
-        major: [ 'message 1' ],
-        minor: [ 'message 2' ],
-        patch: [ 'message 3' ]
-      });
-      done();
-    });
-  });
-
-  test('returns release type `patch` if no tag exists yet.', done => {
-    resultLastTag = null;
-    gitlogSemver((err, releaseType) => {
-      assert.that(err).is.null();
-      assert.that(releaseType).is.equalTo('patch');
-      done();
-    });
-  });
-
-  test('returns an error if getting last tag failed.', done => {
-    errLastTag = new Error('foo');
+  test('returns an error if getting getting all tags failed.', done => {
+    allTags.err = new Error('foo');
     gitlogSemver(err => {
       assert.that(err).is.not.null();
       assert.that(err.message).is.equalTo('foo');
@@ -142,8 +111,26 @@ suite('gitlogSemver', () => {
     });
   });
 
-  test('returns an error if fetching commit messages failed.', done => {
-    errFetch = new Error('foo');
+  test('returns an error if getting getting the first commit failed.', done => {
+    firstCommit.err = new Error('foo');
+    gitlogSemver(err => {
+      assert.that(err).is.not.null();
+      assert.that(err.message).is.equalTo('foo');
+      done();
+    });
+  });
+
+  test('returns an error if getting getting date of tag failed.', done => {
+    dateOfTag.err = new Error('foo');
+    gitlogSemver(err => {
+      assert.that(err).is.not.null();
+      assert.that(err.message).is.equalTo('foo');
+      done();
+    });
+  });
+
+  test('returns an error if evaluation failed.', done => {
+    evaluate.err = new Error('foo');
     gitlogSemver(err => {
       assert.that(err).is.not.null();
       assert.that(err.message).is.equalTo('foo');
