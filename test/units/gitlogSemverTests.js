@@ -81,9 +81,9 @@ suite('gitlogSemver', () => {
     evaluate.result.messages = {
       foo: [ 'bar' ]
     };
-    gitlogSemver((err, releaseType, release) => {
+    gitlogSemver((err, releaseType, messages) => {
       assert.that(err).is.null();
-      assert.that(release.messages).is.equalTo({
+      assert.that(messages).is.equalTo({
         foo: [ 'bar' ]
       });
       done();

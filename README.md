@@ -67,29 +67,27 @@ gitlogSemver(filter, (err, releaseType) => {
 The callback provides the commit messages that match the filter, too.
 
 ```javascript
-gitlogSemver((err, releaseType, release) => {
+gitlogSemver((err, releaseType, messages) => {
   if (err) {
     return console.log('Something went wrong...');
   }
 
-  console.log(release); // =>
+  console.log(messages); // =>
     // {
-    //   messages: {
-    //     major: [
-    //       'foo',
-    //       'bar'
-    //     ],
-    //     minor: [
-    //       'foobar'
-    //     ],
-    //     patch: [
-    //     ]
-    //   }
+    //   major: [
+    //     'foo',
+    //     'bar'
+    //   ],
+    //   minor: [
+    //     'foobar'
+    //   ],
+    //   patch: [
+    //   ]
     // }
 });
 ```
 
-The `messages` property of the `release` object contains an array with the commit messages for each release type. Only the first line of the commit message will be included and the preceding label is already removed from the message text.
+The `messages` object contains an array with the commit messages for each release type. Only the first line of the commit message will be included and the preceding label is already removed from the message text.
 
 #### Release history
 
