@@ -9,7 +9,7 @@ let errFetch,
     resultLastTag;
 
 const gitlogSemver = proxyquire('../../lib/gitlogSemver', {
-  './fetch' (tag, labels, callback) {
+  './fetch' (startTag, endTag, labels, callback) {
     callback(errFetch, resultFetch[labels]);
   },
   './lastTag' (callback) {

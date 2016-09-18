@@ -35,16 +35,16 @@ suite('fetch', () => {
 
   test('throws an error if callback is missing.', done => {
     assert.that(() => {
-      fetch('startTag', []);
+      fetch('startTag', 'endTag', []);
     }).is.throwing('Callback is missing.');
     done();
   });
 
   test('calls `git log`.', done => {
     resultGit = 'line1\nline2\n';
-    fetch('startTag', [ 'label' ], (err, result) => {
+    fetch('startTag', 'endTag', [ 'label' ], (err, result) => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
+      assert.that(calledCommand).is.equalTo('log startTag..endTag --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       assert.that(result).is.equalTo([
         'line1',
         'line2'
@@ -54,24 +54,32 @@ suite('fetch', () => {
   });
 
   test('handles single label as string instead of an array.', done => {
-    fetch('startTag', 'label', err => {
+    fetch('startTag', 'endTag', 'label', err => {
       assert.that(err).is.null();
-      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
+      assert.that(calledCommand).is.equalTo('log startTag..endTag --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();
     });
   });
 
-  test('does not set commit range if no last tag exists.', done => {
-    fetch(null, 'label', err => {
+  test('does not set commit range if no start tag exists.', done => {
+    fetch(null, 'endTag', 'label', err => {
       assert.that(err).is.null();
       assert.that(calledCommand).is.equalTo('log  --oneline --grep "^(label) +" -E -i --pretty=format:%s');
       done();
     });
   });
 
+  test('uses \'HEAD\' as end point of the commit range if no end tag exists.', done => {
+    fetch('startTag', null, 'label', err => {
+      assert.that(err).is.null();
+      assert.that(calledCommand).is.equalTo('log startTag..HEAD --oneline --grep "^(label) +" -E -i --pretty=format:%s');
+      done();
+    });
+  });
+
   test('ignores empty lines in stdout.', done => {
     resultGit = 'line1\n\n';
-    fetch('startTag', [ 'label' ], (err, result) => {
+    fetch('startTag', 'endTag', [ 'label' ], (err, result) => {
       assert.that(err).is.null();
       assert.that(result).is.equalTo([
         'line1'
@@ -82,7 +90,7 @@ suite('fetch', () => {
 
   test('returns an error if `git log` failed.', done => {
     errGit = new Error('foo');
-    fetch('startTag', [ 'label' ], err => {
+    fetch('startTag', 'endTag', [ 'label' ], err => {
       assert.that(err).is.not.null();
       assert.that(err.message).is.equalTo('foo');
       done();
