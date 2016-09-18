@@ -1,6 +1,6 @@
 {
   "name": "gitlog-semver",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Identify the required Semantic Versioning release type based on commit messages.",
   "main": "lib/gitlogSemver.js",
   "scripts": {
