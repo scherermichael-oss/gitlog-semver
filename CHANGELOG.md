@@ -1,7 +1,5 @@
 # Changelog
 
-## <a name='0-2-4' />0.2.4 &ndash; 2016-09-18
-
 ## <a name='0-2-3' />0.2.3 &ndash; 2016-09-18
 
 ### Bugfixes
