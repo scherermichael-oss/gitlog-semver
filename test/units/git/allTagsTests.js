@@ -46,6 +46,15 @@ suite('allTags', () => {
     });
   });
 
+  test('returns an empty array if no tag exists.', done => {
+    resultGit = '';
+    allTags((err, result) => {
+      assert.that(err).is.null();
+      assert.that(result).is.equalTo([]);
+      done();
+    });
+  });
+
   test('returns an error if `git tag` failed.', done => {
     errGit = new Error('foo');
     allTags(err => {
