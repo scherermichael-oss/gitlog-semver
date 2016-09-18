@@ -73,19 +73,19 @@ gitlogSemver((err, releaseType, release) => {
   }
 
   console.log(release); // =>
-    {
-      messages: {
-        major: [
-          'foo',
-          'bar'
-        ],
-        minor: [
-          'foobar'
-        ],
-        patch: [
-        ]
-      }
-    }
+    // {
+    //   messages: {
+    //     major: [
+    //       'foo',
+    //       'bar'
+    //     ],
+    //     minor: [
+    //       'foobar'
+    //     ],
+    //     patch: [
+    //     ]
+    //   }
+    // }
 });
 ```
 
