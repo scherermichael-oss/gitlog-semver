@@ -83,9 +83,13 @@ suite('gitlogSemver', () => {
     };
     gitlogSemver((err, releaseType, messages) => {
       assert.that(err).is.null();
-      assert.that(messages).is.equalTo({
-        foo: [ 'bar' ]
-      });
+      assert.that(messages).is.equalTo([{
+        version: undefined,
+        date: undefined,
+        messages: {
+          foo: [ 'bar' ]
+        }
+      }]);
       done();
     });
   });

@@ -67,27 +67,21 @@ gitlogSemver(filter, (err, releaseType) => {
 The callback provides the commit messages that match the filter, too.
 
 ```javascript
-gitlogSemver((err, releaseType, messages) => {
+gitlogSemver((err, releaseType, releases) => {
   if (err) {
     return console.log('Something went wrong...');
   }
 
-  console.log(messages); // =>
-    // {
-    //   major: [
-    //     'foo',
-    //     'bar'
-    //   ],
-    //   minor: [
-    //     'foobar'
-    //   ],
-    //   patch: [
-    //   ]
-    // }
+  console.log(releases); // =>
+    // [{
+    //   major: [ 'Breaking changes made' ],
+    //   minor: [ 'Some new minor features'],
+    //   patch: []
+    // }]
 });
 ```
 
-The `messages` object contains an array with the commit messages for each release type. Only the first line of the commit message will be included and the preceding label is already removed from the message text.
+The `releases` array contains exactly one object with an array with the commit messages for each release type. Only the first line of the commit message will be included and the preceding label is already removed from the message text.
 
 #### Release history
 
@@ -133,7 +127,9 @@ gitlogSemver(filter, (err, releaseType, releases) => {
 });
 ```
 
-The returned `releases` is an array of objects. An object contains the `version` of a release (name of the tag) and its creation `date`. The `messages` property lists all matching commit messages. The last object contains only a `messages` property with the messages of all commits that are not yet released.
+The returned `releases` is an array of objects. An object contains the `version` of a release (name of the tag) and its creation `date`. The `messages` property lists all matching commit messages.
+
+The array's last object contains only a `messages` property with the messages of all commits that are not yet released. It is equal to the only object returned if `limit` is not set or set to `1` (see section above).
 
 By setting the `limit` to a positive number, you can define the maximum length of the `releases` array.
 
