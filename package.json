@@ -29,7 +29,7 @@
     "assertthat": "0.8.0",
     "proxyquire": "1.7.10",
     "roboter": "0.13.0",
-    "roboter-server": "0.13.0"
+    "roboter-server": "0.16.0"
   },
   "dependencies": {
     "shelljs": "0.7.4"
