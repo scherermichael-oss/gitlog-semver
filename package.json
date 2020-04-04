@@ -32,6 +32,6 @@
     "roboter-server": "0.13.0"
   },
   "dependencies": {
-    "shelljs": "0.7.4"
+    "shelljs": "0.8.3"
   }
 }
